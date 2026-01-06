@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Open Link</title>
+</head>
+<body>
+  <button onclick="openLink()">Open Link</button>
+  <script>
+    async function openLink() {
+      // MUST open immediately on click
+      const newTab = window.open("", "_blank");
+
+      try {
+        const res = await fetch("http://127.0.0.1:5000/get-link");
+        const data = await res.json();
+
+        // Redirect the already-opened tab
+         window.location.href = data.url;
+      } catch (err) {
+        newTab.close();
+        alert("Failed to fetch link");
+      }
+    }
+  </script>
+</body>
+</html>
