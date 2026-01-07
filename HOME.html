@@ -1,26 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Open Link</title>
+  <title>Run 30 Times</title>
 </head>
+
 <body>
-  <button onclick="openLink()">Open Link</button>
-  <script>
-    async function openLink() {
-      // MUST open immediately on click
-      const newTab = window.open("", "_blank");
+<button onclick="runNTimes(10)">Start</button>
+<script>
+  function randomBetween(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  async function openRandom() {
+    const res = await fetch("list.txt");
+    const text = await res.text();
+    const words = text
+      .split("\n")
+      .map(w => w.trim())
+      .filter(Boolean);
+    const word = words[Math.floor(Math.random() * words.length)];
+    const url = `https://www.bing.com/search?q=${encodeURIComponent(word)}`;
+    const win = window.open(url, "_blank");
+    const closeDelay = randomBetween(3000, 6000);
+    setTimeout(() => {
+      if (win) win.close();
+    }, closeDelay);
+  }
 
-      try {
-        const res = await fetch("http://127.0.0.1:5000/get-link");
-        const data = await res.json();
-
-        // Redirect the already-opened tab
-         window.location.href = data.url;
-      } catch (err) {
-        newTab.close();
-        alert("Failed to fetch link");
-      }
+  async function runNTimes(n) {
+    for (let i = 0; i < n; i++) {
+      await openRandom();
+      // wait random 3–6 sec before next open
+      await new Promise(resolve =>
+        setTimeout(resolve, randomBetween(3000, 6000))
+      );
     }
-  </script>
+  }
+</script>
 </body>
 </html>
