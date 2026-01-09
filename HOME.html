@@ -1,15 +1,250 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Run 30 Times</title>
+  <title>Bing Search Automation</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 50px;
+      max-width: 500px;
+      width: 100%;
+      animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      color: #555;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    button {
+      flex: 1;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .start-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .start-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .start-btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .reset-btn {
+      background: #f0f0f0;
+      color: #333;
+      border: 2px solid #e0e0e0;
+    }
+
+    .reset-btn:hover:not(:disabled) {
+      background: #e0e0e0;
+    }
+
+    .start-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 600;
+      display: none;
+    }
+
+    .status.active {
+      display: block;
+      animation: pulse 0.5s ease-out;
+    }
+
+    @keyframes pulse {
+      from {
+        transform: scale(0.95);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .status.running {
+      background: #e3f2fd;
+      color: #1976d2;
+      border-left: 4px solid #1976d2;
+    }
+
+    .status.completed {
+      background: #e8f5e9;
+      color: #388e3c;
+      border-left: 4px solid #388e3c;
+    }
+
+    .status.error {
+      background: #ffebee;
+      color: #c62828;
+      border-left: 4px solid #c62828;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(25, 118, 210, 0.3);
+      border-top-color: #1976d2;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .info-box {
+      background: #f5f5f5;
+      border-left: 4px solid #667eea;
+      padding: 12px 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #666;
+    }
+  </style>
 </head>
 
 <body>
-<button onclick="runNTimes(10)">Start</button>
+<div class="container">
+  <h1>🔍 Bing Search Automation</h1>
+  <p class="subtitle">Automate your Bing searches with ease</p>
+
+  <div class="form-group">
+    <label for="runCount">Number of Searches</label>
+    <input 
+      type="number" 
+      id="runCount" 
+      min="1" 
+      max="100" 
+      value="10"
+      placeholder="Enter number of times to run"
+    >
+  </div>
+
+  <div class="button-group">
+    <button class="start-btn" onclick="startAutomation()">Start</button>
+    <button class="reset-btn" onclick="resetForm()">Reset</button>
+  </div>
+
+  <div id="status" class="status"></div>
+
+  <div class="info-box">
+    <strong>ℹ️ How it works:</strong><br>
+    Each search window will stay open for 3-6 seconds, and there will be a 6-10 second delay between searches.
+  </div>
+</div>
+
 <script>
   function randomBetween(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
+
+  function showStatus(message, type = 'running') {
+    const statusEl = document.getElementById('status');
+    statusEl.innerHTML = message;
+    statusEl.className = `status active ${type}`;
+  }
+
+  function hideStatus() {
+    const statusEl = document.getElementById('status');
+    statusEl.className = 'status';
+  }
+
   async function openRandom() {
     const res = await fetch("list.txt");
     const text = await res.text();
@@ -18,7 +253,7 @@
       .map(w => w.trim())
       .filter(Boolean);
     const word = words[Math.floor(Math.random() * words.length)];
-    const url = `https://www.bing.com/search?q=${encodeURIComponent(word)}`;
+    const url = `https://www.bing.com/search?pglt=419&q=${encodeURIComponent(word)}&cvid=45b42cac9396417f9a0b265c27e453ff&gs_lcrp=EgRlZGdlKgYIABBFGDsyBggAEEUYOzIGCAEQRRhBMgYIAhBFGDwyBggDEEUYQTIGCAQQRRhBMgYIBRBFGDwyBggGEEUYPNIBBzcxMmowajGoAgCwAgA&FORM=ANNTA1&PC=ACTS`;
     const win = window.open(url, "_blank");
     const closeDelay = randomBetween(3000, 6000);
     setTimeout(() => {
@@ -28,12 +263,44 @@
 
   async function runNTimes(n) {
     for (let i = 0; i < n; i++) {
+      showStatus(`<span class="spinner"></span>Running search ${i + 1} of ${n}`);
       await openRandom();
-      // wait random 3–6 sec before next open
+      // wait random 6–10 sec before next open
       await new Promise(resolve =>
-        setTimeout(resolve, randomBetween(3000, 6000))
+        setTimeout(resolve, randomBetween(6000, 10000))
       );
     }
+  }
+
+  function startAutomation() {
+    const input = document.getElementById('runCount');
+    const runCount = parseInt(input.value);
+
+    if (!input.value || runCount < 1 || runCount > 100) {
+      showStatus('❌ Please enter a number between 1 and 100', 'error');
+      return;
+    }
+
+    document.querySelector('.start-btn').disabled = true;
+    input.disabled = true;
+
+    runNTimes(runCount).then(() => {
+      showStatus(`✅ Completed ${runCount} searches!`, 'completed');
+      document.querySelector('.start-btn').disabled = false;
+      input.disabled = false;
+    }).catch(err => {
+      showStatus('❌ An error occurred', 'error');
+      document.querySelector('.start-btn').disabled = false;
+      input.disabled = false;
+      console.error(err);
+    });
+  }
+
+  function resetForm() {
+    document.getElementById('runCount').value = 10;
+    hideStatus();
+    document.querySelector('.start-btn').disabled = false;
+    document.getElementById('runCount').disabled = false;
   }
 </script>
 </body>
