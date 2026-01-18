@@ -47,11 +47,30 @@ A simple automation tool to run multiple Bing searches automatically with random
 
 ## Usage
 
-1.  **Open the web interface**
-   - Open your browser and navigate to `http://localhost:5000` (or the provided URL)
-   - Or open `HOME.html` directly in your browser
+### Option 1: Direct (Recommended - Easiest)
 
-3. **Configure and run searches**
+Simply open `HOME.html` directly in your browser:
+- **Windows:** Double-click `HOME.html` or right-click → Open with → Your browser
+- **macOS/Linux:** Double-click `HOME.html`
+
+The application should work immediately if your browser allows local file access.
+
+### Option 2: Backend Server (If Option 1 Doesn't Work)
+
+If the application doesn't work with Option 1, use the Flask backend server:
+
+1. **Start the Flask server**
+   ```bash
+   python backend.py
+   ```
+   The server will run at `http://localhost:5000`
+
+2. **Open the web interface**
+   - Open your browser and navigate to `http://localhost:5000`
+
+### Running Searches
+
+Once the interface loads (via either option):
    - Enter the number of searches to run (1-100)
    - Click **Start** to begin the automation
    - Each search will:
@@ -60,7 +79,7 @@ A simple automation tool to run multiple Bing searches automatically with random
      - Close automatically
      - Wait 6-10 seconds before the next search
 
-4. **Control searches**
+3. **Control searches**
    - **Pause** - Click to pause during execution
    - **Resume** - Click to resume paused searches
    - **Reset** - Clear the form and cancel any running searches
@@ -90,6 +109,11 @@ A simple automation tool to run multiple Bing searches automatically with random
 - Reset button clears the form and cancels ongoing automation
 
 ## Troubleshooting
+
+**If Option 1 (Direct HTML) doesn't work:**
+- Some browsers block local file access for security reasons
+- Solution: Use Option 2 (Backend Server) instead
+- Or: Use a Live Server extension in your code editor (VS Code Live Server, etc.)
 
 **Keywords not loading**
 - Ensure `list.txt` exists in the same directory 
