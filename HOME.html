@@ -7,7 +7,7 @@
 
 <body>
 <div class="container">
-  <h1>🔍 Bing Search Automation</h1>
+  <h1>Bing Search Automation</h1>
   <p class="subtitle">Automate your Bing searches with ease</p>
 
   <div class="form-group">
@@ -24,6 +24,7 @@
 
   <div class="button-group">
     <button class="start-btn" onclick="startAutomation()">Start</button>
+    <button class="pause-btn" id="pauseBtn" onclick="togglePause()" disabled>Pause</button>
     <button class="reset-btn" onclick="resetForm()">Reset</button>
   </div>
 
@@ -36,6 +37,9 @@
 </div>
 
 <script>
+  let isPaused = false;
+  let pauseResolve = null;
+
   function randomBetween(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
@@ -49,6 +53,34 @@
   function hideStatus() {
     const statusEl = document.getElementById('status');
     statusEl.className = 'status';
+  }
+
+  function togglePause() {
+    isPaused = !isPaused;
+    const pauseBtn = document.getElementById('pauseBtn');
+    
+    if (isPaused) {
+      pauseBtn.textContent = 'Resume';
+      pauseBtn.classList.add('paused');
+      showStatus(`⏸️ Search paused`, 'paused');
+    } else {
+      pauseBtn.textContent = 'Pause';
+      pauseBtn.classList.remove('paused');
+      if (pauseResolve) {
+        pauseResolve();
+        pauseResolve = null;
+      }
+    }
+  }
+
+  function waitForUnpause() {
+    return new Promise(resolve => {
+      if (!isPaused) {
+        resolve();
+      } else {
+        pauseResolve = resolve;
+      }
+    });
   }
 
   async function openRandom() {
@@ -69,6 +101,7 @@
 
   async function runNTimes(n) {
     for (let i = 0; i < n; i++) {
+      await waitForUnpause();
       showStatus(`<span class="spinner"></span>Running search ${i + 1} of ${n}`);
       await openRandom();
       // wait random 6–10 sec before next open
@@ -87,25 +120,37 @@
       return;
     }
 
+    isPaused = false;
     document.querySelector('.start-btn').disabled = true;
+    document.getElementById('pauseBtn').disabled = false;
     input.disabled = true;
 
     runNTimes(runCount).then(() => {
       showStatus(`✅ Completed ${runCount} searches!`, 'completed');
       document.querySelector('.start-btn').disabled = false;
+      document.getElementById('pauseBtn').disabled = true;
+      document.getElementById('pauseBtn').textContent = 'Pause';
+      document.getElementById('pauseBtn').classList.remove('paused');
       input.disabled = false;
     }).catch(err => {
       showStatus('❌ An error occurred', 'error');
       document.querySelector('.start-btn').disabled = false;
+      document.getElementById('pauseBtn').disabled = true;
+      document.getElementById('pauseBtn').textContent = 'Pause';
+      document.getElementById('pauseBtn').classList.remove('paused');
       input.disabled = false;
       console.error(err);
     });
   }
 
   function resetForm() {
+    isPaused = false;
     document.getElementById('runCount').value = 10;
     hideStatus();
     document.querySelector('.start-btn').disabled = false;
+    document.getElementById('pauseBtn').disabled = true;
+    document.getElementById('pauseBtn').textContent = 'Pause';
+    document.getElementById('pauseBtn').classList.remove('paused');
     document.getElementById('runCount').disabled = false;
   }
 </script>
